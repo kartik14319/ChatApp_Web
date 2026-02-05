@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import path from "path";
+import {dir} from "console";
 
 import userRoute from "./routes/user.route.js";
 import messageRoute from "./routes/message.route.js";
@@ -34,6 +36,17 @@ try {
 // routes
 app.use("/api/user", userRoute);
 app.use("/api/message", messageRoute);
+
+// deployment 
+
+if(process.env.NODE_ENV ==="production" ){
+  const dirPath = path.resolve();
+  app.use(express.static("./Frontend/dist"));
+  app.get("/*splat",(req,res)=>{
+    res.sendFile(path.resolve(dirPath,"./Frontend/dist","index.html"));
+  })
+
+}
 
 // optional Socket.IO logging
 io.on("connection", (socket) => {

@@ -55,7 +55,7 @@
 // };
 
 
-import { getReceiverSocketId, getIO } from "../SocketIO/Server.js";
+import { getReceiverSocketId, getIO } from "../SocketIO/server.js";
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 

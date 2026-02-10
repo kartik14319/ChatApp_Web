@@ -58,6 +58,8 @@
 
 
 
+
+
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
@@ -75,55 +77,48 @@ dotenv.config();
 const app = express();
 const server = createServer(app);
 
-// middleware
+// ---------------- MIDDLEWARE ----------------
 app.use(express.json());
 app.use(cookieParser());
-
 app.use(
   cors({
-    origin: ["http://localhost:3001", "http://localhost:5173"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3001",
+      "https://chat-app-kartik143.onrender.com",
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 
-// MongoDB
+// ---------------- MONGODB ----------------
 const URI = process.env.MONGO_DB_URL;
 mongoose
   .connect(URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch(console.error);
 
-// routes
+// ---------------- ROUTES ----------------
 app.use("/api/user", userRoute);
 app.use("/api/message", messageRoute);
 
-if (process.env.NODE_ENV === "production") {
-  const dirPath = path.resolve();
-  app.use(express.static(path.join(dirPath, "Frontend/dist")));
-
-  // Catch-all route
-  app.get("/*splat", (req, res) => {
-    res.sendFile(path.resolve(dirPath, "Frontend/dist", "index.html"));
-  });
-}
-
-
-// initialize socket.io
+// ---------------- SOCKET.IO ----------------
 initSocket(server);
 
-// deployment for production build
+// ---------------- PRODUCTION ----------------
 if (process.env.NODE_ENV === "production") {
   const dirPath = path.resolve();
   app.use(express.static(path.join(dirPath, "Frontend/dist")));
 
-  app.get("/*splat", (req, res) => {
+  app.get("*", (req, res) => {
     res.sendFile(path.resolve(dirPath, "Frontend/dist", "index.html"));
   });
 }
 
-// start server (ONLY here)
+// ---------------- START SERVER ----------------
 const PORT = process.env.PORT || 4002;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+

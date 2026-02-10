@@ -36,51 +36,41 @@
 // });
 
 
-
 import { Server } from "socket.io";
 
-let io; // store io instance
+let io;
 const users = {};
 
-// function to get io instance in controllers
-export const getIO = () => {
-  if (!io) throw new Error("Socket.io not initialized");
-  return io;
-};
-
-// get receiver socket id
-export const getReceiverSocketId = (receiverId) => users[receiverId];
-
-// initialize socket
 export const initSocket = (server) => {
   io = new Server(server, {
     cors: {
       origin: [
-        "http://localhost:3001",
         "http://localhost:5173",
+        "http://localhost:3001",
         "https://chat-app-kartik143.onrender.com",
       ],
+      methods: ["GET", "POST"],
       credentials: true,
     },
   });
 
   io.on("connection", (socket) => {
-    console.log("Socket connected:", socket.id);
-
-    const userId = socket.handshake.auth?.userId;
+    console.log("User connected:", socket.id);
+    const userId = socket.handshake.query.userId;
     if (userId) {
       users[userId] = socket.id;
-      console.log("Current online users:", users);
+      console.log("Online users:", users);
     }
 
     io.emit("getOnlineUsers", Object.keys(users));
 
     socket.on("disconnect", () => {
+      console.log("User disconnected:", socket.id);
       if (userId) delete users[userId];
       io.emit("getOnlineUsers", Object.keys(users));
-      console.log("Socket disconnected:", socket.id);
     });
   });
-
-  return io;
 };
+
+export const getReceiverSocketId = (receiverId) => users[receiverId];
+export const getIO = () => io;

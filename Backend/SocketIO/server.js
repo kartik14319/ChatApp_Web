@@ -41,7 +41,7 @@
 import { Server } from "socket.io";
 
 const users = {}; // { userId: socketId }
-let io;
+export let io;  // top-level export
 
 export const initSocket = (server) => {
   io = new Server(server, {
